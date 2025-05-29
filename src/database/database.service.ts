@@ -9,12 +9,16 @@ import { UpdateArtistDto } from 'src/artist/dto/updateArtist.dto';
 import { Album } from 'src/album/album.interface';
 import { CreateAlbumDto } from 'src/album/dto/createAlbum.dto';
 import { UpdateAlbumDto } from 'src/album/dto/updateAlbum.dto';
+import { Track } from 'src/track/track.interface';
+import { CreateTrackDto } from 'src/track/dto/createTrack.dto';
+import { UpdateTrackDto } from 'src/track/dto/updateTrack.dto';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
+  private tracks: Track[] = [];
 
   // private getAll<T>(data: T[]): T[] {
   //   return data;
@@ -191,6 +195,50 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.albums = newArray;
+    }
+    return wasDeleted;
+  }
+
+  getAllTracks(): Track[] {
+    return this.tracks;
+  }
+
+  getTrackById(id: string): Track | undefined {
+    return this.findById(this.tracks, id);
+  }
+
+  createTrack(createTrackData: CreateTrackDto): Track {
+    const newTrack = this.createItem(this.tracks, createTrackData, {
+      name: createTrackData.name,
+      artistId: createTrackData.artistId,
+      albumId: createTrackData.albumId,
+      duration: createTrackData.duration,
+    });
+    return newTrack;
+  }
+
+  updateTrack(id: string, updateTrackData: UpdateTrackDto) {
+    const track = this.getTrackById(id);
+    if (!track) {
+      return undefined;
+    }
+    if (updateTrackData.name !== undefined) track.name = updateTrackData.name;
+    if (updateTrackData.artistId !== undefined)
+      track.artistId = updateTrackData.artistId;
+    if (updateTrackData.albumId !== undefined)
+      track.albumId = updateTrackData.albumId;
+    if (updateTrackData.duration !== undefined)
+      track.duration = updateTrackData.duration;
+    return track;
+  }
+
+  deleteTrack(id: string): boolean {
+    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+      this.tracks,
+      id,
+    );
+    if (wasDeleted) {
+      this.tracks = newArray;
     }
     return wasDeleted;
   }
