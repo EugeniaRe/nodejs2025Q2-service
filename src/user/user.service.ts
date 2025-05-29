@@ -4,10 +4,9 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-// import { User } from './interfaces/user.interface';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { CreateUserDto } from './dto/createUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { UserResponseDto } from './dto/userResponse.dto';
 import { instanceToPlain } from 'class-transformer';
 
 @Injectable()

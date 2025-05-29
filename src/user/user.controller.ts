@@ -15,9 +15,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { CreateUserDto } from './dto/createUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { UserResponseDto } from './dto/userResponse.dto';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -39,9 +39,7 @@ export class UserController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe())
-  async create(
-    @Body() createUserData: CreateUserDto,
-  ): Promise<UserResponseDto> {
+  create(@Body() createUserData: CreateUserDto): UserResponseDto {
     return this.userService.createUser(createUserData);
   }
 
@@ -56,7 +54,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // 204
+  @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id', ParseUUIDPipe) id: string): void {
     this.userService.deleteUser(id);
   }

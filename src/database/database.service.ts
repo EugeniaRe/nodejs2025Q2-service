@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../user/user.interface';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UpdatePasswordDto } from '../user/dto/update-password.dto';
+import { CreateUserDto } from '../user/dto/createUser.dto';
+import { UpdatePasswordDto } from '../user/dto/updatePassword.dto';
+import { Artist } from 'src/artist/artist.interface';
+import { CreateArtistDto } from 'src/artist/dto/createArtist.dto';
+import { UpdateArtistDto } from 'src/artist/dto/updateArtist.dto';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
+  private artists: Artist[] = [];
 
   // private getAll<T>(data: T[]): T[] {
   //   return data;
@@ -32,21 +36,21 @@ export class DatabaseService {
     return newItem;
   }
 
-  private updateItem<T extends { id: string }, Uto>(
-    data: T[],
-    id: string,
-    dto: Uto,
-    updateLogic: (item: T, updateDto: Uto) => void,
-  ): T | undefined {
-    const index = data.findIndex((item) => item.id === id);
-    if (index === -1) {
-      return undefined;
-    }
-    const item = data[index];
-    updateLogic(item, dto);
+  // private updateItem<T extends { id: string }, Uto>(
+  //   data: T[],
+  //   id: string,
+  //   dto: Uto,
+  //   updateLogic: (item: T, updateDto: Uto) => void,
+  // ): T | undefined {
+  //   const index = data.findIndex((item) => item.id === id);
+  //   if (index === -1) {
+  //     return undefined;
+  //   }
+  //   const item = data[index];
+  //   updateLogic(item, dto);
 
-    return item;
-  }
+  //   return item;
+  // }
 
   private filterArrayAndCheckDeletion<T extends { id: string }>(
     dataArray: T[],
@@ -105,6 +109,44 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.users = newArray;
+    }
+    return wasDeleted;
+  }
+
+  getArtists(): Artist[] {
+    return this.artists;
+  }
+
+  getArtistById(id: string): Artist | undefined {
+    return this.findById(this.artists, id);
+  }
+
+  createArtist(createArtistData: CreateArtistDto): Artist {
+    const newArtist = this.createItem(this.artists, createArtistData, {
+      name: createArtistData.name,
+      grammy: createArtistData.grammy,
+    });
+    return newArtist;
+  }
+
+  updateArtist(id: string, updateArtistData: UpdateArtistDto) {
+    const artist = this.getArtistById(id);
+    if (!artist) {
+      return undefined;
+    }
+    if (updateArtistData.name !== undefined)
+      artist.name = updateArtistData.name;
+    if (updateArtistData.grammy !== undefined)
+      artist.grammy = updateArtistData.grammy;
+    return artist;
+  }
+  deleteArtist(id: string): boolean {
+    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+      this.artists,
+      id,
+    );
+    if (wasDeleted) {
+      this.artists = newArray;
     }
     return wasDeleted;
   }

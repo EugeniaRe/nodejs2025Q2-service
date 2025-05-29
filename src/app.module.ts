@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { DatabaseModule } from './database/database.module'; // Import Global module
+import { DatabaseModule } from './database/database.module';
+import { ArtistModule } from './artist/artist.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { DatabaseModule } from './database/database.module'; // Import Global mo
     }),
     DatabaseModule,
     UserModule,
+    ArtistModule,
   ],
   controllers: [],
   providers: [],
