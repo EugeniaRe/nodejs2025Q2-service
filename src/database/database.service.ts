@@ -6,11 +6,15 @@ import { UpdatePasswordDto } from '../user/dto/updatePassword.dto';
 import { Artist } from 'src/artist/artist.interface';
 import { CreateArtistDto } from 'src/artist/dto/createArtist.dto';
 import { UpdateArtistDto } from 'src/artist/dto/updateArtist.dto';
+import { Album } from 'src/album/album.interface';
+import { CreateAlbumDto } from 'src/album/dto/createAlbum.dto';
+import { UpdateAlbumDto } from 'src/album/dto/updateAlbum.dto';
 
 @Injectable()
 export class DatabaseService {
   private users: User[] = [];
   private artists: Artist[] = [];
+  private albums: Album[] = [];
 
   // private getAll<T>(data: T[]): T[] {
   //   return data;
@@ -147,6 +151,46 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.artists = newArray;
+    }
+    return wasDeleted;
+  }
+
+  getAllAlbums(): Album[] {
+    return this.albums;
+  }
+
+  getAlbumById(id: string): Album | undefined {
+    return this.findById(this.albums, id);
+  }
+
+  createAlbum(createAlbumData: CreateAlbumDto): Album {
+    const newAlbum = this.createItem(this.albums, createAlbumData, {
+      name: createAlbumData.name,
+      year: createAlbumData.year,
+      artistId: createAlbumData.artistId,
+    });
+    return newAlbum;
+  }
+
+  updateAlbum(id: string, updateAlbumData: UpdateAlbumDto) {
+    const album = this.getAlbumById(id);
+    if (!album) {
+      return undefined;
+    }
+    if (updateAlbumData.name !== undefined) album.name = updateAlbumData.name;
+    if (updateAlbumData.year !== undefined) album.year = updateAlbumData.year;
+    if (updateAlbumData.artistId !== undefined)
+      album.artistId = updateAlbumData.artistId;
+    return album;
+  }
+
+  deleteAlbum(id: string): boolean {
+    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+      this.albums,
+      id,
+    );
+    if (wasDeleted) {
+      this.albums = newArray;
     }
     return wasDeleted;
   }

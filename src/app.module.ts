@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { ArtistModule } from './artist/artist.module';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ArtistModule } from './artist/artist.module';
     DatabaseModule,
     UserModule,
     ArtistModule,
+    AlbumModule,
   ],
   controllers: [],
   providers: [],
