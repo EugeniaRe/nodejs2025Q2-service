@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../user/user.interface';
 import { CreateUserDto } from '../user/dto/createUser.dto';
@@ -12,6 +12,8 @@ import { UpdateAlbumDto } from 'src/album/dto/updateAlbum.dto';
 import { Track } from 'src/track/track.interface';
 import { CreateTrackDto } from 'src/track/dto/createTrack.dto';
 import { UpdateTrackDto } from 'src/track/dto/updateTrack.dto';
+import { Favorites } from 'src/favorites/interfaces/favorites.interface';
+import { FavoritesResponse } from 'src/favorites/interfaces/favoritesResponse.interface';
 
 @Injectable()
 export class DatabaseService {
@@ -19,6 +21,11 @@ export class DatabaseService {
   private artists: Artist[] = [];
   private albums: Album[] = [];
   private tracks: Track[] = [];
+  private favorites: Favorites = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 
   // private getAll<T>(data: T[]): T[] {
   //   return data;
@@ -155,6 +162,16 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.artists = newArray;
+      this.tracks.find((track) => {
+        if (track.artistId === id) {
+          track.artistId = null;
+        }
+      });
+      this.albums.find((album) => {
+        if (album.artistId === id) {
+          album.artistId = null;
+        }
+      });
     }
     return wasDeleted;
   }
@@ -195,6 +212,11 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.albums = newArray;
+      this.tracks.find((track) => {
+        if (track.albumId === id) {
+          track.albumId = null;
+        }
+      });
     }
     return wasDeleted;
   }
@@ -241,5 +263,81 @@ export class DatabaseService {
       this.tracks = newArray;
     }
     return wasDeleted;
+  }
+
+  getAllFavorites(): FavoritesResponse {
+    const albums = this.favorites.albums
+      .map((id) => this.findById(this.albums, id))
+      .filter((album): album is Album => album !== undefined);
+    const artists = this.favorites.artists
+      .map((id) => this.findById(this.artists, id))
+      .filter((artist): artist is Artist => artist !== undefined);
+    const tracks = this.favorites.tracks
+      .map((id) => this.findById(this.tracks, id))
+      .filter((track): track is Track => track !== undefined);
+    return { albums, artists, tracks };
+  }
+
+  addFavoriteTrack(id: string): void {
+    const track = this.findById(this.tracks, id);
+    if (!track) {
+      throw new NotFoundException(`Track with id ${id} not found`);
+    }
+    if (!this.favorites.tracks.includes(id)) {
+      this.favorites.tracks.push(id);
+    }
+  }
+
+  deleteFavoriteTrack(id: string): void {
+    const favsLength = this.favorites.tracks.length;
+    this.favorites.tracks = this.favorites.tracks.filter(
+      (trackId) => trackId !== id,
+    );
+
+    if (this.favorites.tracks.length === favsLength) {
+      throw new NotFoundException(`Track with id ${id} not found`);
+    }
+  }
+
+  addFavoriteArtist(id: string): void {
+    const artist = this.findById(this.artists, id);
+    if (!artist) {
+      throw new NotFoundException(`Artist with id ${id} not found`);
+    }
+    if (!this.favorites.artists.includes(id)) {
+      this.favorites.artists.push(id);
+    }
+  }
+
+  deleteFavoriteArtist(id: string): void {
+    const favsLength = this.favorites.artists.length;
+    this.favorites.artists = this.favorites.artists.filter(
+      (artistId) => artistId !== id,
+    );
+
+    if (this.favorites.artists.length === favsLength) {
+      throw new NotFoundException(`Track with id ${id} not found`);
+    }
+  }
+
+  addFavoriteAlbum(id: string): void {
+    const album = this.findById(this.albums, id);
+    if (!album) {
+      throw new NotFoundException(`Artist with id ${id} not found`);
+    }
+    if (!this.favorites.albums.includes(id)) {
+      this.favorites.albums.push(id);
+    }
+  }
+
+  deleteFavoriteAlbum(id: string): void {
+    const favsLength = this.favorites.albums.length;
+    this.favorites.albums = this.favorites.albums.filter(
+      (albumId) => albumId !== id,
+    );
+
+    if (this.favorites.albums.length === favsLength) {
+      throw new NotFoundException(`Track with id ${id} not found`);
+    }
   }
 }
