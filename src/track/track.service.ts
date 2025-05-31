@@ -32,7 +32,7 @@ export class TrackService {
     return track;
   }
 
-  deleteTrack(id: string): void {
+  deleteTrack(id: string) {
     const track = this.databaseService.deleteTrack(id);
     if (!track) {
       throw new NotFoundException(`Track with id ${id} not found`);

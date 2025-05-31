@@ -27,10 +27,6 @@ export class DatabaseService {
     tracks: [],
   };
 
-  // private getAll<T>(data: T[]): T[] {
-  //   return data;
-  // }
-
   private findById<T extends { id: string }>(
     data: T[],
     id: string,
@@ -50,22 +46,6 @@ export class DatabaseService {
     data.push(newItem);
     return newItem;
   }
-
-  // private updateItem<T extends { id: string }, Uto>(
-  //   data: T[],
-  //   id: string,
-  //   dto: Uto,
-  //   updateLogic: (item: T, updateDto: Uto) => void,
-  // ): T | undefined {
-  //   const index = data.findIndex((item) => item.id === id);
-  //   if (index === -1) {
-  //     return undefined;
-  //   }
-  //   const item = data[index];
-  //   updateLogic(item, dto);
-
-  //   return item;
-  // }
 
   private filterArrayAndCheckDeletion<T extends { id: string }>(
     dataArray: T[],
@@ -172,6 +152,9 @@ export class DatabaseService {
           album.artistId = null;
         }
       });
+      this.favorites.artists = this.favorites.artists.filter(
+        (favId) => favId !== id,
+      );
     }
     return wasDeleted;
   }
@@ -217,6 +200,9 @@ export class DatabaseService {
           track.albumId = null;
         }
       });
+      this.favorites.albums = this.favorites.albums.filter(
+        (favId) => favId !== id,
+      );
     }
     return wasDeleted;
   }
@@ -261,6 +247,9 @@ export class DatabaseService {
     );
     if (wasDeleted) {
       this.tracks = newArray;
+      this.favorites.tracks = this.favorites.tracks.filter(
+        (favId) => favId !== id,
+      );
     }
     return wasDeleted;
   }
