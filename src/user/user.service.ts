@@ -13,13 +13,13 @@ import { instanceToPlain } from 'class-transformer';
 export class UserService {
   constructor(private databaseService: DatabaseService) {}
 
-  getAllUsers(): UserResponseDto[] {
-    const users = this.databaseService.getUsers();
+  async getAllUsers() {
+    const users = await this.databaseService.getUsers();
     return users.map((user) => delete user.password && user);
   }
 
-  getUserById(id: string): UserResponseDto {
-    const user = this.databaseService.getUserById(id);
+  async getUserById(id: string) {
+    const user = await this.databaseService.getUserById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
@@ -28,8 +28,8 @@ export class UserService {
     return user;
   }
 
-  createUser(createUserDto: CreateUserDto): UserResponseDto {
-    const newUser = this.databaseService.createUser(createUserDto);
+  async createUser(createUserDto: CreateUserDto) {
+    const newUser = await this.databaseService.createUser(createUserDto);
     const responseUser = instanceToPlain(newUser, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
@@ -37,11 +37,11 @@ export class UserService {
     delete responseUser.password;
     return responseUser;
   }
-  updateUser(
-    id: string,
-    updatePasswordData: UpdatePasswordDto,
-  ): UserResponseDto {
-    const updatedUser = this.databaseService.updateUser(id, updatePasswordData);
+  async updateUser(id: string, updatePasswordData: UpdatePasswordDto) {
+    const updatedUser = await this.databaseService.updateUser(
+      id,
+      updatePasswordData,
+    );
 
     if (updatedUser === undefined) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -51,13 +51,25 @@ export class UserService {
       throw new ForbiddenException(`Old password is wrong`);
     }
     delete updatedUser.password;
-    return updatedUser as UserResponseDto;
+    return updatedUser;
   }
 
-  deleteUser(id: string): void {
-    const deleted = this.databaseService.deleteUser(id);
-    if (!deleted) {
+  // async deleteUser(id: string) {
+  //   const wasDeleted = await this.databaseService.deleteUser(id);
+  //   console.log(wasDeleted);
+  //   if (!wasDeleted) {
+  //     throw new NotFoundException(`User with id ${id} not found`);
+  //   }
+  // }
+  async deleteUser(id: string) {
+    const userExists = await this.databaseService.getUserById(id);
+    if (!userExists) {
       throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    const wasDeleted = await this.databaseService.deleteUser(id);
+    if (!wasDeleted) {
+      throw new Error(`Failed to delete user with id ${id}`);
     }
   }
 }

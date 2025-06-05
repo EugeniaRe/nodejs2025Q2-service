@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../user/user.interface';
+import { User as UserInterface } from '../user/user.interface';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 import { UpdatePasswordDto } from '../user/dto/updatePassword.dto';
 import { Artist } from 'src/artist/artist.interface';
@@ -14,10 +14,18 @@ import { CreateTrackDto } from 'src/track/dto/createTrack.dto';
 import { UpdateTrackDto } from 'src/track/dto/updateTrack.dto';
 import { Favorites } from 'src/favorites/interfaces/favorites.interface';
 import { FavoritesResponse } from 'src/favorites/interfaces/favoritesResponse.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class DatabaseService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  private users: UserInterface[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
   private tracks: Track[] = [];
@@ -57,31 +65,37 @@ export class DatabaseService {
     return { newArray, wasDeleted };
   }
 
-  getUsers(): User[] {
-    return this.users;
+  async getUsers() {
+    return await this.usersRepository.find();
   }
 
-  getUserById(id: string): User | undefined {
-    return this.findById(this.users, id);
+  async getUserById(id: string) {
+    // return this.findById(this.users, id);
+    return await this.usersRepository.findOneBy({ id });
   }
 
-  createUser(createUserData: CreateUserDto): User {
+  async createUser(createUserData: CreateUserDto) {
     const createdTime = Date.now();
-    const newUser = this.createItem(this.users, createUserData, {
+    const user = await this.usersRepository.save({
       login: createUserData.login,
       password: createUserData.password,
       version: 1,
       createdAt: createdTime,
       updatedAt: createdTime,
     });
-    return newUser;
+    return user;
+    // const newUser = this.createItem(this.users, createUserData, {
+    //   login: createUserData.login,
+    //   password: createUserData.password,
+    //   version: 1,
+    //   createdAt: createdTime,
+    //   updatedAt: createdTime,
+    // });
+    // return newUser;
   }
 
-  updateUser(
-    id: string,
-    updatePasswordData: UpdatePasswordDto,
-  ): User | undefined | null {
-    const user = this.getUserById(id);
+  async updateUser(id: string, updatePasswordData: UpdatePasswordDto) {
+    const user = await this.getUserById(id);
     if (!user) {
       return undefined;
     }
@@ -90,22 +104,33 @@ export class DatabaseService {
       return null;
     }
 
-    user.password = updatePasswordData.newPassword;
-    user.version += 1;
-    user.updatedAt = Date.now();
+    await this.usersRepository.update(id, {
+      password: updatePasswordData.newPassword,
+      version: user.version + 1,
+      updatedAt: Date.now(),
+    });
+    const updatedUser = await this.getUserById(id);
 
-    return user;
+    return updatedUser;
   }
 
-  deleteUser(id: string): boolean {
-    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
-      this.users,
-      id,
-    );
-    if (wasDeleted) {
-      this.users = newArray;
+  async deleteUser(id: string) {
+    // const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+    //   this.users,
+    //   id,
+    // );
+    // if (wasDeleted) {
+    //   this.users = newArray;
+    // }
+    // return wasDeleted;
+    const user = await this.getUserById(id);
+    if (!user) {
+      return false;
     }
-    return wasDeleted;
+
+    await this.usersRepository.delete(id);
+
+    return true;
   }
 
   getArtists(): Artist[] {
