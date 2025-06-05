@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { Album } from './album.interface';
+// import { Album } from './album.interface';
 import { CreateAlbumDto } from './dto/createAlbum.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 
@@ -8,12 +8,12 @@ import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 export class AlbumService {
   constructor(private databaseService: DatabaseService) {}
 
-  getAllAlbums(): Album[] {
+  async getAllAlbums() {
     return this.databaseService.getAllAlbums();
   }
 
-  getAlbumById(id: string): Album | undefined {
-    const album = this.databaseService.getAlbumById(id);
+  async getAlbumById(id: string) {
+    const album = await this.databaseService.getAlbumById(id);
     if (!album) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
@@ -21,12 +21,12 @@ export class AlbumService {
     return album;
   }
 
-  createAlbum(createAlbumData: CreateAlbumDto): Album {
+  async createAlbum(createAlbumData: CreateAlbumDto) {
     return this.databaseService.createAlbum(createAlbumData);
   }
 
-  updateAlbum(id: string, updateAlbumData: UpdateAlbumDto): Album {
-    const album = this.databaseService.updateAlbum(id, updateAlbumData);
+  async updateAlbum(id: string, updateAlbumData: UpdateAlbumDto) {
+    const album = await this.databaseService.updateAlbum(id, updateAlbumData);
     if (!album) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
@@ -34,8 +34,8 @@ export class AlbumService {
     return album;
   }
 
-  deleteAlbum(id: string): void {
-    const album = this.databaseService.deleteAlbum(id);
+  async deleteAlbum(id: string) {
+    const album = await this.databaseService.deleteAlbum(id);
     if (!album) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }

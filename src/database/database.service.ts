@@ -3,10 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { User as UserInterface } from '../user/user.interface';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 import { UpdatePasswordDto } from '../user/dto/updatePassword.dto';
-import { Artist } from 'src/artist/artist.interface';
+// import { Artist } from 'src/artist/artist.interface';
 import { CreateArtistDto } from 'src/artist/dto/createArtist.dto';
 import { UpdateArtistDto } from 'src/artist/dto/updateArtist.dto';
-import { Album } from 'src/album/album.interface';
+// import { Album } from 'src/album/album.interface';
 import { CreateAlbumDto } from 'src/album/dto/createAlbum.dto';
 import { UpdateAlbumDto } from 'src/album/dto/updateAlbum.dto';
 import { Track } from 'src/track/track.interface';
@@ -17,12 +17,20 @@ import { FavoritesResponse } from 'src/favorites/interfaces/favoritesResponse.in
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/user.entity';
+import { Album } from '../album/album.entity';
+import { Artist } from 'src/artist/artist.entity';
 
 @Injectable()
 export class DatabaseService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+
+    @InjectRepository(Album)
+    private albumRepository: Repository<Album>,
+
+    @InjectRepository(Artist)
+    private artistRepository: Repository<Artist>,
   ) {}
 
   private users: UserInterface[] = [];
@@ -115,14 +123,6 @@ export class DatabaseService {
   }
 
   async deleteUser(id: string) {
-    // const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
-    //   this.users,
-    //   id,
-    // );
-    // if (wasDeleted) {
-    //   this.users = newArray;
-    // }
-    // return wasDeleted;
     const user = await this.getUserById(id);
     if (!user) {
       return false;
@@ -133,32 +133,42 @@ export class DatabaseService {
     return true;
   }
 
-  getArtists(): Artist[] {
-    return this.artists;
+  async getArtists() {
+    return this.artistRepository.find();
   }
 
-  getArtistById(id: string): Artist | undefined {
-    return this.findById(this.artists, id);
+  async getArtistById(id: string) {
+    return this.artistRepository.findOneBy({ id });
   }
 
-  createArtist(createArtistData: CreateArtistDto): Artist {
-    const newArtist = this.createItem(this.artists, createArtistData, {
+  async createArtist(createArtistData: CreateArtistDto) {
+    const newArtist = await this.artistRepository.save({
       name: createArtistData.name,
       grammy: createArtistData.grammy,
     });
+    // const newArtist = this.createItem(this.artists, createArtistData, {
+    //   name: createArtistData.name,
+    //   grammy: createArtistData.grammy,
+    // });
     return newArtist;
   }
 
-  updateArtist(id: string, updateArtistData: UpdateArtistDto) {
+  async updateArtist(id: string, updateArtistData: UpdateArtistDto) {
     const artist = this.getArtistById(id);
     if (!artist) {
       return undefined;
     }
     if (updateArtistData.name !== undefined)
-      artist.name = updateArtistData.name;
+      await this.artistRepository.update(id, {
+        name: updateArtistData.name,
+      });
     if (updateArtistData.grammy !== undefined)
-      artist.grammy = updateArtistData.grammy;
-    return artist;
+      await this.artistRepository.update(id, {
+        grammy: updateArtistData.grammy,
+      });
+
+    const updatedArtist = await this.getArtistById(id);
+    return updatedArtist;
   }
   deleteArtist(id: string): boolean {
     const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
@@ -184,33 +194,49 @@ export class DatabaseService {
     return wasDeleted;
   }
 
-  getAllAlbums(): Album[] {
-    return this.albums;
+  async getAllAlbums() {
+    return this.albumRepository.find();
   }
 
-  getAlbumById(id: string): Album | undefined {
-    return this.findById(this.albums, id);
+  async getAlbumById(id: string) {
+    return this.albumRepository.findOneBy({ id });
   }
 
-  createAlbum(createAlbumData: CreateAlbumDto): Album {
-    const newAlbum = this.createItem(this.albums, createAlbumData, {
-      name: createAlbumData.name,
-      year: createAlbumData.year,
-      artistId: createAlbumData.artistId,
-    });
+  async createAlbum(createAlbumData: CreateAlbumDto) {
+    const newAlbum = await this.albumRepository.save(createAlbumData);
+    // const newAlbum = this.createItem(this.albums, createAlbumData, {
+    //   name: createAlbumData.name,
+    //   year: createAlbumData.year,
+    //   artistId: createAlbumData.artistId,
+    // });
     return newAlbum;
   }
 
-  updateAlbum(id: string, updateAlbumData: UpdateAlbumDto) {
-    const album = this.getAlbumById(id);
+  async updateAlbum(id: string, updateAlbumData: UpdateAlbumDto) {
+    const album = await this.getAlbumById(id);
     if (!album) {
       return undefined;
     }
-    if (updateAlbumData.name !== undefined) album.name = updateAlbumData.name;
-    if (updateAlbumData.year !== undefined) album.year = updateAlbumData.year;
+    // if (updateAlbumData.name !== undefined) album.name = updateAlbumData.name;
+    // if (updateAlbumData.year !== undefined) album.year = updateAlbumData.year;
+    // if (updateAlbumData.artistId !== undefined)
+    //   album.artistId = updateAlbumData.artistId;
+    if (updateAlbumData.name !== undefined)
+      await this.albumRepository.update(id, {
+        name: updateAlbumData.name,
+      });
+    if (updateAlbumData.year !== undefined)
+      await this.albumRepository.update(id, {
+        year: updateAlbumData.year,
+      });
     if (updateAlbumData.artistId !== undefined)
-      album.artistId = updateAlbumData.artistId;
-    return album;
+      await this.albumRepository.update(id, {
+        artistId: updateAlbumData.artistId,
+      });
+
+    const updatedAlbum = await this.getAlbumById(id);
+
+    return updatedAlbum;
   }
 
   deleteAlbum(id: string): boolean {

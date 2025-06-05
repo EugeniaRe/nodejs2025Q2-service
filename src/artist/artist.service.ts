@@ -11,12 +11,12 @@ import { UpdateArtistDto } from './dto/updateArtist.dto';
 export class ArtistService {
   constructor(private databaseService: DatabaseService) {}
 
-  getAllArtists() {
+  async getAllArtists() {
     return this.databaseService.getArtists();
   }
 
-  getArtistById(id: string) {
-    const artist = this.databaseService.getArtistById(id);
+  async getArtistById(id: string) {
+    const artist = await this.databaseService.getArtistById(id);
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
@@ -24,16 +24,19 @@ export class ArtistService {
     return artist;
   }
 
-  createArtist(createArtistData: CreateArtistDto) {
+  async createArtist(createArtistData: CreateArtistDto) {
     return this.databaseService.createArtist(createArtistData);
   }
 
-  updateArtist(id: string, updateArtistData: UpdateArtistDto) {
+  async updateArtist(id: string, updateArtistData: UpdateArtistDto) {
     if (!updateArtistData.name && !updateArtistData.grammy) {
       throw new BadRequestException('No fields to update');
     }
 
-    const artist = this.databaseService.updateArtist(id, updateArtistData);
+    const artist = await this.databaseService.updateArtist(
+      id,
+      updateArtistData,
+    );
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
@@ -41,8 +44,8 @@ export class ArtistService {
     return artist;
   }
 
-  deleteArtist(id: string) {
-    const artist = this.databaseService.deleteArtist(id);
+  async deleteArtist(id: string) {
+    const artist = await this.databaseService.deleteArtist(id);
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
