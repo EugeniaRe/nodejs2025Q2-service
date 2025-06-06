@@ -15,6 +15,7 @@ export class UserService {
 
   async getAllUsers() {
     const users = await this.databaseService.getUsers();
+
     return users.map((user) => delete user.password && user);
   }
 
@@ -35,6 +36,7 @@ export class UserService {
       enableCircularCheck: true,
     }) as UserResponseDto;
     delete responseUser.password;
+
     return responseUser;
   }
   async updateUser(id: string, updatePasswordData: UpdatePasswordDto) {
@@ -51,6 +53,7 @@ export class UserService {
       throw new ForbiddenException(`Old password is wrong`);
     }
     delete updatedUser.password;
+
     return updatedUser;
   }
 

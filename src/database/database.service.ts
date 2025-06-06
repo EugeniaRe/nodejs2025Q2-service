@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User as UserInterface } from '../user/user.interface';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 import { UpdatePasswordDto } from '../user/dto/updatePassword.dto';
 // import { Artist } from 'src/artist/artist.interface';
@@ -36,7 +35,7 @@ export class DatabaseService {
     private trackRepository: Repository<Track>,
   ) {}
 
-  private users: UserInterface[] = [];
+  private users: User[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
   private tracks: Track[] = [];
@@ -81,7 +80,6 @@ export class DatabaseService {
   }
 
   async getUserById(id: string) {
-    // return this.findById(this.users, id);
     return await this.usersRepository.findOneBy({ id });
   }
 
@@ -118,7 +116,7 @@ export class DatabaseService {
     await this.usersRepository.update(id, {
       password: updatePasswordData.newPassword,
       version: user.version + 1,
-      updatedAt: Date.now(),
+      updatedAt: Number(Date.now()),
     });
 
     const updatedUser = await this.getUserById(id);
@@ -204,6 +202,24 @@ export class DatabaseService {
     }
     await this.artistRepository.delete(id);
 
+    const tracks = await this.trackRepository.find();
+    tracks.map(async (track) => {
+      if (track.artistId === id) {
+        await this.trackRepository.update(track.id, {
+          artistId: null,
+        });
+      }
+    });
+
+    const albums = await this.albumRepository.find();
+    albums.map(async (album) => {
+      if (album.artistId === id) {
+        await this.albumRepository.update(album.id, {
+          artistId: null,
+        });
+      }
+    });
+
     return true;
   }
 
@@ -276,6 +292,15 @@ export class DatabaseService {
     }
     await this.albumRepository.delete(id);
 
+    const tracks = await this.trackRepository.find();
+    tracks.map(async (track) => {
+      if (track.albumId === id) {
+        await this.trackRepository.update(track.id, {
+          albumId: null,
+        });
+      }
+    });
+
     return true;
   }
 
@@ -339,7 +364,7 @@ export class DatabaseService {
     //     (favId) => favId !== id,
     //   );
     // }
-    const track = this.findById(this.tracks, id);
+    const track = await this.trackRepository.findOneBy({ id });
     if (!track) {
       return false;
     }

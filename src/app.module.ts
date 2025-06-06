@@ -33,6 +33,9 @@ import { Track } from './track/track.entity';
       database: process.env.DB_DATABASE,
       entities: [User, Artist, Album, Track],
       synchronize: true,
+      extra: {
+        parseInt8: true,
+      },
     }),
   ],
   controllers: [],
