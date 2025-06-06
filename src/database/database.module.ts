@@ -4,10 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
 import { Album } from 'src/album/album.entity';
 import { Artist } from 'src/artist/artist.entity';
+import { Track } from 'src/track/track.entity';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Album, Artist])],
+  imports: [TypeOrmModule.forFeature([User, Album, Artist, Track])],
 
   providers: [DatabaseService],
   exports: [DatabaseService],

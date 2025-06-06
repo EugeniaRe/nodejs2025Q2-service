@@ -9,7 +9,6 @@ import { UpdateArtistDto } from 'src/artist/dto/updateArtist.dto';
 // import { Album } from 'src/album/album.interface';
 import { CreateAlbumDto } from 'src/album/dto/createAlbum.dto';
 import { UpdateAlbumDto } from 'src/album/dto/updateAlbum.dto';
-import { Track } from 'src/track/track.interface';
 import { CreateTrackDto } from 'src/track/dto/createTrack.dto';
 import { UpdateTrackDto } from 'src/track/dto/updateTrack.dto';
 import { Favorites } from 'src/favorites/interfaces/favorites.interface';
@@ -18,7 +17,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Album } from '../album/album.entity';
-import { Artist } from 'src/artist/artist.entity';
+import { Artist } from '../artist/artist.entity';
+import { Track } from '../track/track.entity';
 
 @Injectable()
 export class DatabaseService {
@@ -31,6 +31,9 @@ export class DatabaseService {
 
     @InjectRepository(Artist)
     private artistRepository: Repository<Artist>,
+
+    @InjectRepository(Track)
+    private trackRepository: Repository<Track>,
   ) {}
 
   private users: UserInterface[] = [];
@@ -117,7 +120,10 @@ export class DatabaseService {
       version: user.version + 1,
       updatedAt: Date.now(),
     });
+
     const updatedUser = await this.getUserById(id);
+
+    console.log(typeof updatedUser.updatedAt);
 
     return updatedUser;
   }
@@ -170,28 +176,35 @@ export class DatabaseService {
     const updatedArtist = await this.getArtistById(id);
     return updatedArtist;
   }
-  deleteArtist(id: string): boolean {
-    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
-      this.artists,
-      id,
-    );
-    if (wasDeleted) {
-      this.artists = newArray;
-      this.tracks.find((track) => {
-        if (track.artistId === id) {
-          track.artistId = null;
-        }
-      });
-      this.albums.find((album) => {
-        if (album.artistId === id) {
-          album.artistId = null;
-        }
-      });
-      this.favorites.artists = this.favorites.artists.filter(
-        (favId) => favId !== id,
-      );
+  async deleteArtist(id: string) {
+    // const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+    //   this.artists,
+    //   id,
+    // );
+    // if (wasDeleted) {
+    //   this.artists = newArray;
+    //   this.tracks.find((track) => {
+    //     if (track.artistId === id) {
+    //       track.artistId = null;
+    //     }
+    //   });
+    //   this.albums.find((album) => {
+    //     if (album.artistId === id) {
+    //       album.artistId = null;
+    //     }
+    //   });
+    //   this.favorites.artists = this.favorites.artists.filter(
+    //     (favId) => favId !== id,
+    //   );
+    // }
+    // return wasDeleted;
+    const artist = await this.getArtistById(id);
+    if (!artist) {
+      return false;
     }
-    return wasDeleted;
+    await this.artistRepository.delete(id);
+
+    return true;
   }
 
   async getAllAlbums() {
@@ -239,70 +252,100 @@ export class DatabaseService {
     return updatedAlbum;
   }
 
-  deleteAlbum(id: string): boolean {
-    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
-      this.albums,
-      id,
-    );
-    if (wasDeleted) {
-      this.albums = newArray;
-      this.tracks.find((track) => {
-        if (track.albumId === id) {
-          track.albumId = null;
-        }
-      });
-      this.favorites.albums = this.favorites.albums.filter(
-        (favId) => favId !== id,
-      );
+  async deleteAlbum(id: string) {
+    // const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+    //   this.albums,
+    //   id,
+    // );
+    // if (wasDeleted) {
+    //   this.albums = newArray;
+    //   this.tracks.find((track) => {
+    //     if (track.albumId === id) {
+    //       track.albumId = null;
+    //     }
+    //   });
+    //   this.favorites.albums = this.favorites.albums.filter(
+    //     (favId) => favId !== id,
+    //   );
+    // }
+    // return wasDeleted;
+
+    const album = await this.getAlbumById(id);
+    if (!album) {
+      return false;
     }
-    return wasDeleted;
+    await this.albumRepository.delete(id);
+
+    return true;
   }
 
-  getAllTracks(): Track[] {
-    return this.tracks;
+  async getAllTracks() {
+    return this.trackRepository.find();
   }
 
-  getTrackById(id: string): Track | undefined {
-    return this.findById(this.tracks, id);
+  async getTrackById(id: string) {
+    return this.trackRepository.findOneBy({ id });
   }
 
-  createTrack(createTrackData: CreateTrackDto): Track {
-    const newTrack = this.createItem(this.tracks, createTrackData, {
-      name: createTrackData.name,
-      artistId: createTrackData.artistId,
-      albumId: createTrackData.albumId,
-      duration: createTrackData.duration,
-    });
+  async createTrack(createTrackData: CreateTrackDto) {
+    const newTrack = await this.trackRepository.save(createTrackData);
+    // const newTrack = this.createItem(this.tracks, createTrackData, {
+    //   name: createTrackData.name,
+    //   artistId: createTrackData.artistId,
+    //   albumId: createTrackData.albumId,
+    //   duration: createTrackData.duration,
+    // });
     return newTrack;
   }
 
-  updateTrack(id: string, updateTrackData: UpdateTrackDto) {
-    const track = this.getTrackById(id);
+  async updateTrack(id: string, updateTrackData: UpdateTrackDto) {
+    const track = await this.trackRepository.findOneBy({ id });
     if (!track) {
       return undefined;
     }
-    if (updateTrackData.name !== undefined) track.name = updateTrackData.name;
+    if (updateTrackData.name !== undefined)
+      // track.name = updateTrackData.name;
+      await this.trackRepository.update(id, {
+        name: updateTrackData.name,
+      });
     if (updateTrackData.artistId !== undefined)
-      track.artistId = updateTrackData.artistId;
+      await this.trackRepository.update(id, {
+        artistId: updateTrackData.artistId,
+      });
+    // track.artistId = updateTrackData.artistId;
     if (updateTrackData.albumId !== undefined)
-      track.albumId = updateTrackData.albumId;
+      await this.trackRepository.update(id, {
+        albumId: updateTrackData.albumId,
+      });
+    // track.albumId = updateTrackData.albumId;
     if (updateTrackData.duration !== undefined)
-      track.duration = updateTrackData.duration;
-    return track;
+      await this.trackRepository.update(id, {
+        duration: updateTrackData.duration,
+      });
+    // track.duration = updateTrackData.duration;
+
+    const updatedTrack = await this.trackRepository.findOneBy({ id });
+    return updatedTrack;
   }
 
-  deleteTrack(id: string): boolean {
-    const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
-      this.tracks,
-      id,
-    );
-    if (wasDeleted) {
-      this.tracks = newArray;
-      this.favorites.tracks = this.favorites.tracks.filter(
-        (favId) => favId !== id,
-      );
+  async deleteTrack(id: string) {
+    // const { newArray, wasDeleted } = this.filterArrayAndCheckDeletion(
+    //   this.tracks,
+    //   id,
+    // );
+    // if (wasDeleted) {
+    //   this.tracks = newArray;
+    //   this.favorites.tracks = this.favorites.tracks.filter(
+    //     (favId) => favId !== id,
+    //   );
+    // }
+    const track = this.findById(this.tracks, id);
+    if (!track) {
+      return false;
     }
-    return wasDeleted;
+    await this.trackRepository.delete(id);
+
+    return true;
   }
 
   getAllFavorites(): FavoritesResponse {

@@ -22,27 +22,27 @@ export class ArtistController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  getAll() {
+  async getAll() {
     return this.artistService.getAllArtists();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  getById(@Param('id', ParseUUIDPipe) id: string) {
+  async getById(@Param('id', ParseUUIDPipe) id: string) {
     return this.artistService.getArtistById(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe())
-  create(@Body() createArtistData: CreateArtistDto) {
+  async create(@Body() createArtistData: CreateArtistDto) {
     return this.artistService.createArtist(createArtistData);
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
@@ -51,7 +51,7 @@ export class ArtistController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseUUIDPipe) id: string) {
-    this.artistService.deleteArtist(id);
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
+    await this.artistService.deleteArtist(id);
   }
 }

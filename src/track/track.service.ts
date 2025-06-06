@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { Track } from './track.interface';
 import { CreateTrackDto } from './dto/createTrack.dto';
 import { UpdateTrackDto } from './dto/updateTrack.dto';
 
@@ -8,32 +7,34 @@ import { UpdateTrackDto } from './dto/updateTrack.dto';
 export class TrackService {
   constructor(private databaseService: DatabaseService) {}
 
-  getAllTracks(): Track[] {
+  async getAllTracks() {
     return this.databaseService.getAllTracks();
   }
 
-  getTrackById(id: string): Track | undefined {
-    const track = this.databaseService.getTrackById(id);
+  async getTrackById(id: string) {
+    const track = await this.databaseService.getTrackById(id);
     if (!track) {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
+
     return track;
   }
 
-  createTrack(createTrackData: CreateTrackDto): Track {
+  async createTrack(createTrackData: CreateTrackDto) {
     return this.databaseService.createTrack(createTrackData);
   }
 
-  updateTrack(id: string, updateTrackData: UpdateTrackDto): Track {
-    const track = this.databaseService.updateTrack(id, updateTrackData);
+  async updateTrack(id: string, updateTrackData: UpdateTrackDto) {
+    const track = await this.databaseService.updateTrack(id, updateTrackData);
     if (!track) {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
+
     return track;
   }
 
-  deleteTrack(id: string) {
-    const track = this.databaseService.deleteTrack(id);
+  async deleteTrack(id: string) {
+    const track = await this.databaseService.deleteTrack(id);
     if (!track) {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
