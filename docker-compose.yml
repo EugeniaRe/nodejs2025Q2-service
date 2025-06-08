@@ -1,9 +1,56 @@
-version: '3.8'
+# version: '3.8'
+
+# services:
+#   postgres:
+#     image: postgres:15
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: qwerty
+#       POSTGRES_DB: home_library_db
+#     ports:
+#       - '5432:5432'
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+#   nestjs-app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     restart: unless-stopped
+#     command: npm run start:dev
+#     depends_on:
+#       - postgres
+#     ports:
+#       - '4000:4000'
+#     environment:
+#       DATABASE_HOST: postgres
+#       DATABASE_PORT: 5432
+#       DATABASE_USER: postgres
+#       DATABASE_PASSWORD: qwerty
+#       DATABASE_NAME: home_library_db
+#     volumes:
+#       - .:/app
+#     stdin_open: true
+#     tty: true
+
+# volumes:
+#   postgres_data:
+
+
+# version: '3.8'
+
+networks:
+  library-network:
+    driver: bridge
+    name: home-library-network
 
 services:
   postgres:
     image: postgres:15
-    restart: always
+    restart: unless-stopped
+    networks:
+      - library-network
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: qwerty
@@ -12,14 +59,17 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
 
   nestjs-app:
     build:
       context: .
       dockerfile: Dockerfile
-    command: npm run start:dev
+    restart: unless-stopped
     depends_on:
       - postgres
+    networks:
+      - library-network
     ports:
       - '4000:4000'
     environment:
@@ -28,10 +78,16 @@ services:
       DATABASE_USER: postgres
       DATABASE_PASSWORD: qwerty
       DATABASE_NAME: home_library_db
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - /app/node_modules
     stdin_open: true
     tty: true
 
 volumes:
   postgres_data:
+    name: home-library-pg-data
+  postgres_logs:
+    name: home-library-pg-logs
