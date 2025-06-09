@@ -59,7 +59,7 @@ npm run lint
 npm run format
 ```
 
-Built image in DockerHub `eugeniyare/nestjs-home-library`
+Built  [image](https://hub.docker.com/r/eugeniyare/nestjs-home-library) in DockerHub `eugeniyare/nestjs-home-library`
 
 ## API Endpoints
 
