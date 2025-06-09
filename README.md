@@ -8,24 +8,36 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/EugeniaRe/nodejs2025Q2-service.git
 ```
+
+## Switching the branch
+
+```
+git checkout part2
+```
+
+## Environment Variables
+
+copy file `.env.example` and rename to `.env`
+
+## Build and run the application
+
+launch Docker Desktop
+
+run `docker-compose up --build`
+
+Starting all services in detached mode `docker-compose up -d`
+
+Stop and remove containers and volumes `docker-compose down -v`
+
+Vulnerabilities scanning `npm run scan`
 
 ## Installing NPM modules
 
 ```
 npm install
 ```
-
-## Running application
-
-```
-npm start
-```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
@@ -35,24 +47,6 @@ To run all tests without authorization
 
 ```
 npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
-
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
 ```
 
 ### Auto-fix and format
@@ -65,8 +59,82 @@ npm run lint
 npm run format
 ```
 
-### Debugging in VSCode
+Built  [image](https://hub.docker.com/r/eugeniyare/nestjs-home-library) in DockerHub `eugeniyare/nestjs-home-library`
 
-Press <kbd>F5</kbd> to debug.
+## API Endpoints
 
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+The service provides the following REST endpoints:
+
+Users (/user)
+
+- `GET /user` - Get all users
+
+- `GET /user/:id` - Get single user by ID
+
+- `POST /user` - Create new user
+
+- `PUT /user/:id` - Update user's password
+
+- `DELETE /user/:id` - Delete user
+
+Tracks (/track)
+
+- `GET /track` - Get all tracks
+
+- `GET /track/:id` - Get single track by ID
+
+- `POST /track` - Create new track
+
+- `PUT /track/:id` - Update track info
+
+- `DELETE /track/:id` - Delete track
+
+Artists (/artist)
+
+- `GET /artist` - Get all artists
+
+- `GET /artist/:id` - Get single artist by ID
+
+- `POST /artist` - Create new artist
+
+- `PUT /artist/:id` - Update artist info
+
+- `DELETE /artist/:id` - Delete artist
+
+Albums (/album)
+
+- `GET /album` - Get all albums
+
+- `GET /album/:id` - Get single album by ID
+
+- `POST /album` - Create new album
+
+- `PUT /album/:id` - Update album info
+
+- `DELETE /album/:id` - Delete album
+
+Favorites (/favs)
+
+- `GET /favs` - Get all favorites
+
+- `POST /favs/track/:id` - Add track to favorites
+
+- `DELETE /favs/track/:id` - Remove track from favorites
+
+- `POST /favs/album/:id` - Add album to favorites
+
+- `DELETE /favs/album/:id` - Remove album from favorites
+
+- `POST /favs/artist/:id` - Add artist to favorites
+
+- `DELETE /favs/artist/:id` - Remove artist from favorites
+
+## Manual Testing with Postman
+
+1. Import the OpenAPI specification from `doc/openapi.yml` into Postman
+
+2. Test each endpoint with valid and invalid data to verify:
+
+- Success cases (200, 201, 204 responses)
+
+- Error cases (400, 403, 404, 422 responses)
