@@ -14,23 +14,27 @@ git clone https://github.com/EugeniaRe/nodejs2025Q2-service.git
 ## Switching the branch
 
 ```
-git checkout develop
+git checkout part2
 ```
 
 ## Environment Variables
 
 copy file `.env.example` and rename to `.env`
 
+## Build and run the application
+
+launch Docker Desktop
+
+run `docker-compose up --build`
+
+Starting all services in detached mode `docker-compose up -d`
+
+Stop and remove containers and volumes `docker-compose down -v`
+
 ## Installing NPM modules
 
 ```
 npm install
-```
-
-## Running application
-
-```
-npm start
 ```
 
 ## Testing
