@@ -9,13 +9,13 @@ import { DatabaseService } from 'src/database/database.service';
 export class FavoritesService {
   constructor(private databaseService: DatabaseService) {}
 
-  getAllFavorites() {
+  async getAllFavorites() {
     return this.databaseService.getAllFavorites();
   }
 
-  addTrackToFavorites(id: string) {
+  async addTrackToFavorites(id: string) {
     try {
-      this.databaseService.addFavoriteTrack(id);
+      await this.databaseService.addFavoriteTrack(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnprocessableEntityException(`Track with id ${id} not found`);
@@ -24,9 +24,9 @@ export class FavoritesService {
     }
   }
 
-  deleteTrackFromFavorites(id: string) {
+  async deleteTrackFromFavorites(id: string) {
     try {
-      this.databaseService.deleteFavoriteTrack(id);
+      await this.databaseService.deleteFavoriteTrack(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(
@@ -37,9 +37,9 @@ export class FavoritesService {
     }
   }
 
-  addAlbumToFavorites(id: string) {
+  async addAlbumToFavorites(id: string) {
     try {
-      this.databaseService.addFavoriteAlbum(id);
+      await this.databaseService.addFavoriteAlbum(id);
       return {
         message: `Album with id ${id} added to favorites`,
       };
@@ -51,9 +51,9 @@ export class FavoritesService {
     }
   }
 
-  deleteAlbumFromFavorites(id: string) {
+  async deleteAlbumFromFavorites(id: string) {
     try {
-      this.databaseService.deleteFavoriteAlbum(id);
+      await this.databaseService.deleteFavoriteAlbum(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(
@@ -64,9 +64,9 @@ export class FavoritesService {
     }
   }
 
-  addArtistToFavorites(id: string) {
+  async addArtistToFavorites(id: string) {
     try {
-      this.databaseService.addFavoriteArtist(id);
+      await this.databaseService.addFavoriteArtist(id);
       return {
         message: `Artist with id ${id} added to favorites`,
       };
@@ -80,9 +80,9 @@ export class FavoritesService {
     }
   }
 
-  deleteArtistFromFavorites(id: string) {
+  async deleteArtistFromFavorites(id: string) {
     try {
-      this.databaseService.deleteFavoriteArtist(id);
+      await this.databaseService.deleteFavoriteArtist(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(

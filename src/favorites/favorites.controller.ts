@@ -16,44 +16,44 @@ export class FavoritesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  getAll() {
+  async getAll() {
     return this.favoritesService.getAllFavorites();
   }
 
   @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
-  addTrackToFavorites(@Param('id', ParseUUIDPipe) id: string) {
-    this.favoritesService.addTrackToFavorites(id);
+  async addTrackToFavorites(@Param('id', ParseUUIDPipe) id: string) {
+    await this.favoritesService.addTrackToFavorites(id);
     return `Track with ID ${id} added to favorites successfully`;
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteTrackFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteTrackFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.deleteTrackFromFavorites(id);
   }
 
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
-  addAlbumToFavorites(@Param('id', ParseUUIDPipe) id: string) {
-    this.favoritesService.addAlbumToFavorites(id);
+  async addAlbumToFavorites(@Param('id', ParseUUIDPipe) id: string) {
+    await this.favoritesService.addAlbumToFavorites(id);
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAlbumFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteAlbumFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.deleteAlbumFromFavorites(id);
   }
 
   @Post('artist/:id')
   @HttpCode(HttpStatus.CREATED)
-  addArtistToFavorites(@Param('id', ParseUUIDPipe) id: string) {
+  async addArtistToFavorites(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.addArtistToFavorites(id);
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteArtistFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteArtistFromFavorites(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.deleteArtistFromFavorites(id);
   }
 }

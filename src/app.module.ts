@@ -11,6 +11,7 @@ import { User } from './user/user.entity';
 import { Artist } from './artist/artist.entity';
 import { Album } from './album/album.entity';
 import { Track } from './track/track.entity';
+import { Favorites } from './favorites/favorites.entity';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { Track } from './track/track.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Artist, Album, Track],
+      entities: [User, Artist, Album, Track, Favorites],
       synchronize: true,
       extra: {
         parseInt8: true,

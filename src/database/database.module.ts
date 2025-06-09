@@ -5,10 +5,11 @@ import { User } from 'src/user/user.entity';
 import { Album } from 'src/album/album.entity';
 import { Artist } from 'src/artist/artist.entity';
 import { Track } from 'src/track/track.entity';
+import { Favorites } from 'src/favorites/favorites.entity';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Album, Artist, Track])],
+  imports: [TypeOrmModule.forFeature([User, Album, Artist, Track, Favorites])],
 
   providers: [DatabaseService],
   exports: [DatabaseService],

@@ -1,44 +1,4 @@
-# version: '3.8'
-
-# services:
-#   postgres:
-#     image: postgres:15
-#     restart: unless-stopped
-#     environment:
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: qwerty
-#       POSTGRES_DB: home_library_db
-#     ports:
-#       - '5432:5432'
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-
-#   nestjs-app:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#     restart: unless-stopped
-#     command: npm run start:dev
-#     depends_on:
-#       - postgres
-#     ports:
-#       - '4000:4000'
-#     environment:
-#       DATABASE_HOST: postgres
-#       DATABASE_PORT: 5432
-#       DATABASE_USER: postgres
-#       DATABASE_PASSWORD: qwerty
-#       DATABASE_NAME: home_library_db
-#     volumes:
-#       - .:/app
-#     stdin_open: true
-#     tty: true
-
-# volumes:
-#   postgres_data:
-
-
-# version: '3.8'
+version: '3'
 
 networks:
   library-network:
@@ -47,16 +7,16 @@ networks:
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:latest
     restart: unless-stopped
     networks:
       - library-network
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: qwerty
-      POSTGRES_DB: home_library_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     ports:
-      - '5432:5432'
+      - '5432:${DB_PORT}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_logs:/var/log/postgresql
@@ -71,13 +31,13 @@ services:
     networks:
       - library-network
     ports:
-      - '4000:4000'
+      - '4000:${PORT}'
     environment:
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: qwerty
-      DATABASE_NAME: home_library_db
+      DATABASE_HOST: ${DB_HOST}
+      DATABASE_PORT: ${DB_PORT}
+      DATABASE_USER: ${DB_USERNAME}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_NAME:  ${DB_DATABASE}
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
     volumes:
