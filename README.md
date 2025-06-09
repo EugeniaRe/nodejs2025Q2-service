@@ -57,6 +57,8 @@ npm run lint
 npm run format
 ```
 
+Built image in DockerHub `eugeniyare/nestjs-home-library`
+
 ## API Endpoints
 
 The service provides the following REST endpoints:
