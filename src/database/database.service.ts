@@ -144,6 +144,12 @@ export class DatabaseService {
       }
     });
 
+    const favs = await this.favoritesRepository.find();
+    const f = favs[0].artists.filter((artistId) => artistId !== id);
+    await this.favoritesRepository.update(1, {
+      artists: f,
+    });
+
     return true;
   }
 
@@ -199,6 +205,11 @@ export class DatabaseService {
       }
     });
 
+    const favs = await this.favoritesRepository.find();
+    await this.favoritesRepository.update(1, {
+      albums: favs[0].albums.filter((albumId) => albumId !== id),
+    });
+
     return true;
   }
 
@@ -247,6 +258,11 @@ export class DatabaseService {
       return false;
     }
     await this.trackRepository.delete(id);
+
+    const favs = await this.favoritesRepository.find();
+    await this.favoritesRepository.update(1, {
+      tracks: favs[0].tracks.filter((trackId) => trackId !== id),
+    });
 
     return true;
   }
