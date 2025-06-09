@@ -31,6 +31,8 @@ Starting all services in detached mode `docker-compose up -d`
 
 Stop and remove containers and volumes `docker-compose down -v`
 
+Vulnerabilities scanning `npm run scan`
+
 ## Installing NPM modules
 
 ```
