@@ -57,13 +57,6 @@ export class UserService {
     return updatedUser;
   }
 
-  // async deleteUser(id: string) {
-  //   const wasDeleted = await this.databaseService.deleteUser(id);
-  //   console.log(wasDeleted);
-  //   if (!wasDeleted) {
-  //     throw new NotFoundException(`User with id ${id} not found`);
-  //   }
-  // }
   async deleteUser(id: string) {
     const userExists = await this.databaseService.getUserById(id);
     if (!userExists) {
