@@ -1,4 +1,5 @@
 import { Injectable, LoggerService } from '@nestjs/common';
+import { writeLogToFile } from './rotatingWriter.util';
 
 enum LogLevel {
   error = 0,
@@ -38,6 +39,7 @@ export class LoggingService implements LoggerService {
       console[level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log'](
         msg,
       );
+      await writeLogToFile(msg, level === 'error');
     }
   }
 
