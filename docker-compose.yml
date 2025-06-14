@@ -43,6 +43,7 @@ services:
     volumes:
       - ./src:/app/src
       - /app/node_modules
+      - ./logs:/app/logs
     stdin_open: true
     tty: true
 

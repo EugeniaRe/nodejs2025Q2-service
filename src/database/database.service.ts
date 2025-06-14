@@ -42,6 +42,10 @@ export class DatabaseService {
     return await this.usersRepository.findOneBy({ id });
   }
 
+  async getUserByLogin(login: string) {
+    return await this.usersRepository.findOneBy({ login });
+  }
+
   async createUser(createUserData: CreateUserDto) {
     const createdTime = Date.now();
     const user = await this.usersRepository.save({

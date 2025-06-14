@@ -12,9 +12,12 @@ import { Artist } from './artist/artist.entity';
 import { Album } from './album/album.entity';
 import { Track } from './track/track.entity';
 import { Favorites } from './favorites/favorites.entity';
+// import { LoggingModule } from './logging/logging.module';
+import { LoggingService } from './logger/logging.service';
 
 @Module({
   imports: [
+    // LoggingModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -40,6 +43,6 @@ import { Favorites } from './favorites/favorites.entity';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [LoggingService],
 })
 export class AppModule {}

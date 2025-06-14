@@ -29,6 +29,14 @@ export class UserService {
     return user;
   }
 
+  // getUserByLogin(login: string) {
+  //   const user = this.databaseService.getUserByLogin(login);
+  //   if (!user) {
+  //     throw new NotFoundException(`User with login ${login} not found`);
+  //   }
+  //   return user;
+  // }
+
   async createUser(createUserDto: CreateUserDto) {
     const newUser = await this.databaseService.createUser(createUserDto);
     const responseUser = instanceToPlain(newUser, {
