@@ -12,7 +12,6 @@ import { Artist } from './artist/artist.entity';
 import { Album } from './album/album.entity';
 import { Track } from './track/track.entity';
 import { Favorites } from './favorites/favorites.entity';
-// import { LoggingModule } from './logging/logging.module';
 import { LoggingService } from './logger/logging.service';
 import { AuthModule } from './auth/auth.module';
 

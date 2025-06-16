@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
-// import { JwtUtils, type JwtPayload } from 'src/utils/jwt';
 import { UserService } from '../user/user.service';
 import { SignupUserDto } from './dto/signup.dto';
 import { UserResponseDto } from 'src/user/dto/userResponse.dto';
@@ -29,10 +28,7 @@ export class AuthService {
     return this.userService.createUser(signupDto);
   }
 
-  async login(loginDto: {
-    login: string;
-    password: string;
-  }): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(loginDto: { login: string; password: string }) {
     const user = await this.userService.getUserByLogin(loginDto.login);
     if (!user) {
       throw new ForbiddenException('Access Denied');
