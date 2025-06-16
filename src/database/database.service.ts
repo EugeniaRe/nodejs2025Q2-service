@@ -14,6 +14,7 @@ import { Album } from '../album/album.entity';
 import { Artist } from '../artist/artist.entity';
 import { Track } from '../track/track.entity';
 import { Favorites } from 'src/favorites/favorites.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DatabaseService {
@@ -48,9 +49,11 @@ export class DatabaseService {
 
   async createUser(createUserData: CreateUserDto) {
     const createdTime = Date.now();
+    const salt = await bcrypt.genSalt(parseInt(process.env.CRYPT_SALT));
+    const hashedPassword = await bcrypt.hash(createUserData.password, salt);
     const user = await this.usersRepository.save({
       login: createUserData.login,
-      password: createUserData.password,
+      password: hashedPassword,
       version: 1,
       createdAt: createdTime,
       updatedAt: createdTime,
@@ -64,12 +67,23 @@ export class DatabaseService {
       return undefined;
     }
 
-    if (user.password !== updatePasswordData.oldPassword) {
+    const isCorrectPassword = await bcrypt.compare(
+      updatePasswordData.oldPassword,
+      user.password,
+    );
+
+    if (!isCorrectPassword) {
       return null;
     }
 
+    const salt = await bcrypt.genSalt(parseInt(process.env.CRYPT_SALT));
+    const hashedPassword = await bcrypt.hash(
+      updatePasswordData.newPassword,
+      salt,
+    );
+
     await this.usersRepository.update(id, {
-      password: updatePasswordData.newPassword,
+      password: hashedPassword,
       version: user.version + 1,
       updatedAt: Number(Date.now()),
     });
@@ -77,6 +91,13 @@ export class DatabaseService {
     const updatedUser = await this.getUserById(id);
 
     return updatedUser;
+  }
+
+  async updateUserRefreshToken(id: string, refreshToken: string) {
+    await this.usersRepository.update(id, {
+      refreshToken,
+      updatedAt: Number(Date.now()),
+    });
   }
 
   async deleteUser(id: string) {

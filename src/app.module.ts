@@ -14,10 +14,10 @@ import { Track } from './track/track.entity';
 import { Favorites } from './favorites/favorites.entity';
 // import { LoggingModule } from './logging/logging.module';
 import { LoggingService } from './logger/logging.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    // LoggingModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -28,6 +28,7 @@ import { LoggingService } from './logger/logging.service';
     AlbumModule,
     TrackModule,
     FavoritesModule,
+    AuthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
