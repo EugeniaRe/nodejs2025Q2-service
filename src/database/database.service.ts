@@ -358,7 +358,7 @@ export class DatabaseService {
     }
 
     await this.favoritesRepository.update(1, {
-      albums: favs[0].tracks.filter((trackId) => trackId !== id),
+      tracks: favs[0].tracks.filter((trackId) => trackId !== id),
     });
   }
 
