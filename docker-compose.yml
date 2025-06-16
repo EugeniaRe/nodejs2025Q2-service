@@ -1,0 +1,61 @@
+version: '3'
+
+networks:
+  library-network:
+    driver: bridge
+    name: home-library-network
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    networks:
+      - library-network
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - '5432:${DB_PORT}'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
+
+  nestjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - library-network
+    ports:
+      - '4000:${PORT}'
+    environment:
+      DATABASE_HOST: ${DB_HOST}
+      DATABASE_PORT: ${DB_PORT}
+      DATABASE_USER: ${DB_USERNAME}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_NAME:  ${DB_DATABASE}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_MAX_FILE_SIZE_KB: ${LOG_MAX_FILE_SIZE_KB}
+      CRYPT_SALT: ${CRYPT_SALT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_REFRESH_KEY: ${JWT_SECRET_REFRESH_KEY}
+      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
+      TOKEN_REFRESH_EXPIRE_TIME: ${TOKEN_REFRESH_EXPIRE_TIME}
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+      - ./logs:/app/logs
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+    name: home-library-pg-data
+  postgres_logs:
+    name: home-library-pg-logs
