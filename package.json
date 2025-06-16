@@ -13,6 +13,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "start:docker": "docker-compose up --build",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -23,7 +24,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "scan": "curl -s http://localhost:4000 | findstr /i 'vulnerable' && echo 'Warning: Potential runtime vulnerabilities detected' || echo 'Runtime check passed'"
+    "scan": "curl -s http://localhost:4000 | findstr /i 'vulnerable' && echo 'Warning: Potential runtime vulnerabilities detected' || echo 'Runtime check passed'",
+    "remove": "docker-compose down -v"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.19",
